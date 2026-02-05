@@ -1,0 +1,6 @@
+@FuscaFilmesApi_HostAddress = http://localhost:5057
+
+GET {{FuscaFilmesApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
