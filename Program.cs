@@ -88,7 +88,8 @@ app.MapPut("/diretores/{Id}", (Context context, int Id, Diretor diretorNovo) =>
                 filme = new Filme
                 {
                     Titulo = filmeNovo.Titulo,
-                    Ano = filmeNovo.Ano
+                    Ano = filmeNovo.Ano,
+                    Diretor = diretorNovo,
                 };
 
                 context.Filmes.Add(filme);
