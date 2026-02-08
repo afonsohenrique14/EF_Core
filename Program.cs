@@ -1,20 +1,16 @@
 using System.Text.Json.Serialization;
 using FuscaFilmesApi.DbContexts;
 using FuscaFilmesApi.Entities;
-using Microsoft.AspNetCore.Http.Json;
+using FuscaFilmesApi.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<Context>(
-    options => options.UseSqlite(builder.Configuration["ConnectionStrings:FuscaFilmesStr"])
+    options => options
+        .UseSqlite(builder.Configuration["ConnectionStrings:FuscaFilmesStr"])
+        .LogTo(Console.WriteLine, LogLevel.Information)
 );
-
-// using (var context = new Context())
-// {
-//     context.Database.EnsureCreated();
-// }
 
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
@@ -40,17 +36,92 @@ if (app.Environment.IsDevelopment())
 app.MapGet("/diretores", (Context context) =>
 {
     return context.Diretores
-    .Include(f=> f.Filmes)
+    .Include(f => f.Filmes)
+    .ToList();
+});
+
+app.MapGet("/diretores/{id}", (int id, Context context) =>
+{
+    return context.Diretores
+    .Include(f => f.Filmes)
+    .Where(d => d.Id == id)
+    .ToList();
+});
+
+app.MapGet("/diretores/agregacao/{name}", (string name, Context context) =>
+{
+    var resultado = context.Diretores
+        .Include(d => d.Filmes)
+        .FirstOrDefault(d => d.Name.Contains(name));
+
+    if (resultado == null)
+        return Results.NotFound( new {message = "Diretor não encontrado"});
+
+    return Results.Ok(resultado);
+});
+
+app.MapGet("/diretores/where/{id}", (int id, Context context) =>
+{
+    return context.Diretores
+    .Include(f => f.Filmes)
+    .Where(d => d.Id == id)
     .ToList();
 });
 
 
+app.MapGet("/filmes", (Context context) =>
+{
+    return context.Filmes
+    .OrderByDescending(f => f.Ano)
+    .ThenBy(f => f.Titulo)
+    .Select(f => new
+    {
+        f.Id,
+        f.Titulo,
+        f.Ano,
+        Diretor = f.Diretor.Name
+    })
+    .ToList();
+});
+app.MapGet("/filmes/{id}", (int id, Context context) =>
+{
+    return context.Filmes
+    .Select(f => new
+    {
+        f.Id,
+        f.Titulo,
+        f.Ano,
+        Diretor = f.Diretor.Name
+    })
+    .Where(f => f.Id == id)
+    .ToList();
+});
 
-app.MapPost("/diretores", (Context context, Diretor diretor)  =>
+app.MapGet("/filmesEFFunctions/byName/{titulo}", (string titulo, Context context) =>
+{
+
+    return context.Filmes
+        .Include(f => f.Diretor)
+        .Where(f =>
+            EF.Functions.Like(f.Titulo, $"%{titulo}%")
+        )
+        .ToList();
+
+});
+app.MapGet("/filmesLinQ/byName/{titulo}", (string titulo, Context context) =>
+{
+    return context.Filmes
+    .Include(f => f.Diretor)
+    .Where(f => f.Titulo.ToUpper().Contains(titulo.ToUpper()))
+    .ToList();
+
+});
+
+app.MapPost("/diretores", (Context context, Diretor diretor) =>
 {
     context.Add(diretor);
     context.SaveChanges();
-    
+
 });
 
 app.MapPut("/diretores/{Id}", (Context context, int Id, Diretor diretorNovo) =>
@@ -89,7 +160,7 @@ app.MapPut("/diretores/{Id}", (Context context, int Id, Diretor diretorNovo) =>
                 {
                     Titulo = filmeNovo.Titulo,
                     Ano = filmeNovo.Ano,
-                    Diretor = diretorNovo,
+                    DiretorId = diretorNovo.Id,
                 };
 
                 context.Filmes.Add(filme);
@@ -102,15 +173,68 @@ app.MapPut("/diretores/{Id}", (Context context, int Id, Diretor diretorNovo) =>
     }
 });
 
+app.MapPatch("/filmesUpdate", (Context context, FilmeUpdate filmeUpdate) =>
+{
+
+    var filme = context.Filmes.Find(filmeUpdate.Id);
+
+    if (filme == null)
+    {
+         return Results.NotFound( new{ message = "Filme não encontrado"});
+    }
+
+    filme.Titulo = filmeUpdate.Titulo;
+    filme.Ano = filmeUpdate.Ano;
+
+    context.Filmes.Update(filme);
+
+    context.SaveChanges();
+
+   return Results.Ok( new{ message = $"Filme com Id {filmeUpdate.Id} foi atualizado com sucesso."});
+
+
+});
+app.MapPatch("/filmes", (Context context, FilmeUpdate filmeUpdate) =>
+{
+   var affectedRows = context.Filmes
+        .Where(f => f.Id == filmeUpdate.Id)
+        .ExecuteUpdate(setter => setter
+            .SetProperty(f => f.Titulo, filmeUpdate.Titulo)
+            .SetProperty(f => f.Ano, filmeUpdate.Ano)
+        );
+
+    if(affectedRows > 0)
+    {
+        return Results.Ok( new{ message = $"Você tem um total de {affectedRows} linha(s) afetada(s)."});
+    }
+    else
+    {
+        return Results.NoContent();   
+    }
+
+
+});
+
+app.MapDelete("/filmes/{Id}", (Context context, int Id) =>
+{
+    context.Filmes
+        .Where(f => f.Id == Id)
+        .ExecuteDelete<Filme>();
+
+});
+
+
+
+
 app.MapDelete("/diretores/{Id}", (Context context, int Id) =>
 {
     var diretor = context.Diretores.Find(Id);
 
-    if (diretor !=null)
+    if (diretor != null)
         context.Diretores.Remove(diretor);
-    
+
     context.SaveChanges();
-    
+
 });
 
 
