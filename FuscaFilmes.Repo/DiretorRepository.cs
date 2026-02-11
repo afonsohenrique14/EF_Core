@@ -1,6 +1,7 @@
 using FuscaFilmes.Domain.Entities;
 using FuscaFilmes.Repo.Contexts;
 using FuscaFilmes.Repo.Contratos;
+using FuscaFilmes.Repo.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace FuscaFilmes.Repo;
@@ -60,7 +61,7 @@ public class DiretorRepository(Context _context) : IDiretorRepository
                     {
                         Titulo = filmeNovo.Titulo,
                         Ano = filmeNovo.Ano,
-                        DiretorId = diretorNovo.Id,
+                        // DiretorId = diretorNovo.Id,
                     };
 
                     Context.Filmes.Add(filme);
@@ -77,26 +78,65 @@ public class DiretorRepository(Context _context) : IDiretorRepository
        return Context.SaveChanges() > 0;
     }
 
-    public IEnumerable<Diretor> GetDiretores()
+    public IEnumerable<DiretorDto> GetDiretores()
     {
         return Context.Diretores
         .Include(f => f.Filmes)
+        .Select(d => new DiretorDto
+        {
+            Id = d.Id,
+            Name = d.Name,
+            Filmes = d.Filmes.Select(
+                f => new FilmeDto
+                {
+                    Id = f.Id,
+                    Titulo = f.Titulo,
+                    Ano = f.Ano
+                }
+            ).ToList()
+        })
         .ToList();
     }
 
-    public IEnumerable<Diretor> GetDiretorById(int id)
+    public IEnumerable<DiretorDto> GetDiretorById(int id)
     {
         return Context.Diretores
         .Include(f => f.Filmes)
-        .Where(d => d.Id == id)
+        .Where( d => d.Id == id)
+        .Select(d => new DiretorDto
+        {
+            Id = d.Id,
+            Name = d.Name,
+            Filmes = d.Filmes.Select(
+                f => new FilmeDto
+                {
+                    Id = f.Id,
+                    Titulo = f.Titulo,
+                    Ano = f.Ano
+                }
+            ).ToList()
+        })
         .ToList();
     }
 
-    public IEnumerable<Diretor> GetDiretorWhere(int id)
+    public IEnumerable<DiretorDto> GetDiretorWhere(int id)
     {
         return Context.Diretores
         .Include(f => f.Filmes)
-        .Where(d => d.Id == id)
+        .Where( d => d.Id == id)
+        .Select(d => new DiretorDto
+        {
+            Id = d.Id,
+            Name = d.Name,
+            Filmes = d.Filmes.Select(
+                f => new FilmeDto
+                {
+                    Id = f.Id,
+                    Titulo = f.Titulo,
+                    Ano = f.Ano
+                }
+            ).ToList()
+        })
         .ToList();
     }
 

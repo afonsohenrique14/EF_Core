@@ -1,5 +1,6 @@
-using System;
+
 using FuscaFilmes.Domain.Entities;
+using FuscaFilmes.Repo.Models;
 
 namespace FuscaFilmes.Repo.Contratos;
 
@@ -9,11 +10,11 @@ public interface IDiretorRepository
     void Update(Diretor diretor);
     void Delete(int diretorId);
 
-    IEnumerable<Diretor> GetDiretores();
+    IEnumerable<DiretorDto> GetDiretores();
 
-    IEnumerable<Diretor> GetDiretorById(int id);
+    IEnumerable<DiretorDto> GetDiretorById(int id);
     
-    IEnumerable<Diretor> GetDiretorWhere(int id);
+    IEnumerable<DiretorDto> GetDiretorWhere(int id);
 
     Diretor GetDiretorByName(string name);
     bool SaveChanges();

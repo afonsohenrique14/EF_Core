@@ -19,39 +19,100 @@ public class FilmeRepository(Context _context) : IFilmeRepository
 
     }
 
-    public IEnumerable<Filme> GetFilmeById(int id)
+    public IEnumerable<FilmeDto> GetFilmeById(int id)
     {
         return Context.Filmes
             .Where(f => f.Id == id)
+            .Select(f=> new FilmeDto
+                {
+                    Id = f.Id,
+                    Titulo = f.Titulo,
+                    Ano = f.Ano,
+                    Diretores = f.Diretores.Select(
+                        d=> new DiretorDto
+                            {
+                                Id = d.Id,
+                                Name = d.Name
+
+                            }
+                    )
+                }
+            )
             .ToList();
     }
 
-    public IEnumerable<Filme> GetFilmeByName(string titulo)
+    public IEnumerable<FilmeDto> GetFilmeByName(string titulo)
     {
 
         return Context.Filmes
-            .Include(f => f.Diretor)
+            .Include(f => f.Diretores)
             .Where(f =>
                 EF.Functions.Like(f.Titulo, $"%{titulo}%")
+            )
+            .Select(f=> new FilmeDto
+                {
+                    Id = f.Id,
+                    Titulo = f.Titulo,
+                    Ano = f.Ano,
+                    Diretores = f.Diretores.Select(
+                        d=> new DiretorDto
+                            {
+                                Id = d.Id,
+                                Name = d.Name
+
+                            }
+                    )
+                }
             )
             .ToList();
 
     }
 
-    public IEnumerable<Filme> GetFilmeByNameLinq(string titulo)
+    public IEnumerable<FilmeDto> GetFilmeByNameLinq(string titulo)
     {
         return Context.Filmes
-            .Include(f => f.Diretor)
+            .Include(f => f.Diretores)
             .Where(f => f.Titulo.ToUpper().Contains(titulo.ToUpper()))
+            .Select(f=> new FilmeDto
+                {
+                    Id = f.Id,
+                    Titulo = f.Titulo,
+                    Ano = f.Ano,
+                    Diretores = f.Diretores.Select(
+                        d=> new DiretorDto
+                            {
+                                Id = d.Id,
+                                Name = d.Name
+
+                            }
+                    )
+                }
+            )
             .ToList();
 
     }
 
-    public IEnumerable<Filme> GetFilmes()
+    public IEnumerable<FilmeDto> GetFilmes()
     {
         return Context.Filmes
+            .Include(f=> f.Diretores)
             .OrderByDescending(f => f.Ano)
             .ThenBy(f => f.Titulo)
+            .Select(f=> new FilmeDto
+                {
+                    Id = f.Id,
+                    Titulo = f.Titulo,
+                    Ano = f.Ano,
+                    Diretores = f.Diretores.Select(
+                        d=> new DiretorDto
+                            {
+                                Id = d.Id,
+                                Name = d.Name
+
+                            }
+                    )
+                }
+            )
             .ToList();
     }
 

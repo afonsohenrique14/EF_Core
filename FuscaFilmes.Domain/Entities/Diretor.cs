@@ -6,5 +6,9 @@ public class Diretor
 
     public required string Name { get; set; }
 
+    public ICollection<DiretorFilme> DiretoresFilmes { get; set; } = null!;
+
     public ICollection<Filme> Filmes { get; set; } = [];
+
+    public DiretorDetalhe? DiretorDetalhe {get; set;} 
 }

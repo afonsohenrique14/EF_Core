@@ -1,20 +1,21 @@
 
 using FuscaFilmes.Domain.Entities;
 using FuscaFilmes.Repo.Contratos;
+using FuscaFilmes.Repo.Models;
 
 namespace FuscaFilmes.Api.EnpointsHandlers;
 
 public static class DiretoresHandlers
 {
-    public static IEnumerable<Diretor> GetDiretores(IDiretorRepository diretorRepository)
+    public static IEnumerable<DiretorDto> GetDiretores(IDiretorRepository diretorRepository)
     {
         return diretorRepository.GetDiretores();
     }
-    public static IEnumerable<Diretor> GetDiretorById(int id, IDiretorRepository diretorRepository)
+    public static IEnumerable<DiretorDto> GetDiretorById(int id, IDiretorRepository diretorRepository)
     {
         return diretorRepository.GetDiretorById(id);
     }
-    public static IEnumerable<Diretor> GetDiretorWhere(int id, IDiretorRepository diretorRepository)
+    public static IEnumerable<DiretorDto> GetDiretorWhere(int id, IDiretorRepository diretorRepository)
     {
         return diretorRepository.GetDiretorWhere(id);
     }

@@ -6,22 +6,22 @@ namespace FuscaFilmes.Api.EnpointsHandlers;
 
 public static class FilmesHandlers
 {
-    public static IEnumerable<Filme> GetFilmes(IFilmeRepository repositoryFilmes)
+    public static IEnumerable<FilmeDto> GetFilmes(IFilmeRepository repositoryFilmes)
     {
         return  repositoryFilmes.GetFilmes();
     }
 
-    public static IEnumerable<Filme> GetFilmeById(IFilmeRepository repositoryFilmes, int id)
+    public static IEnumerable<FilmeDto> GetFilmeById(IFilmeRepository repositoryFilmes, int id)
     {
          return repositoryFilmes.GetFilmeById(id);
     }
 
-    public static IEnumerable<Filme> GetFilmeByName(IFilmeRepository repositoryFilmes, string titulo)
+    public static IEnumerable<FilmeDto> GetFilmeByName(IFilmeRepository repositoryFilmes, string titulo)
     {
        return repositoryFilmes.GetFilmeByName(titulo);
     }
 
-    public static IEnumerable<Filme> GetFilmeByNameLinq(IFilmeRepository repositoryFilmes, string titulo) 
+    public static IEnumerable<FilmeDto> GetFilmeByNameLinq(IFilmeRepository repositoryFilmes, string titulo) 
     {
         return repositoryFilmes.GetFilmeByNameLinq(titulo);
 

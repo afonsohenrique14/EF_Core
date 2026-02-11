@@ -6,10 +6,10 @@ namespace FuscaFilmes.Repo.Contratos;
 
 public interface IFilmeRepository
 {
-   IEnumerable<Filme> GetFilmes();
-   IEnumerable<Filme> GetFilmeById(int id);
-   IEnumerable<Filme> GetFilmeByName(string titulo);
-   IEnumerable<Filme> GetFilmeByNameLinq(string titulo);
+   IEnumerable<FilmeDto> GetFilmes();
+   IEnumerable<FilmeDto> GetFilmeById(int id);
+   IEnumerable<FilmeDto> GetFilmeByName(string titulo);
+   IEnumerable<FilmeDto> GetFilmeByNameLinq(string titulo);
    Filme? PatchFilmeWithTRack(FilmeUpdate filmeUpdate);
    int PatchFilme(FilmeUpdate filmeUpdate);
    void DeleteFilme(int Id);
