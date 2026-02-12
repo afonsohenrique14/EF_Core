@@ -11,26 +11,26 @@ public class DiretorRepository(Context _context) : IDiretorRepository
 
     public Context Context { get; } = _context;
 
-    public void Add(Diretor diretor)
+    public async Task AddAsync(Diretor diretor)
     {
-        Context.Add(diretor);
+        await Context.AddAsync(diretor);
     }
 
-    public void Delete(int Id)
+    public async Task DeleteAsync(int Id)
     {
-        var diretor = Context.Diretores.Find(Id);
+        var diretor = await Context.Diretores.FindAsync(Id);
 
         if (diretor != null)
             Context.Diretores.Remove(diretor);
 
     }
 
-    public void Update(Diretor diretorNovo)
+    public async Task UpdateAsync(Diretor diretorNovo)
     {
 
-        var diretor = Context.Diretores
+        var diretor = await Context.Diretores
             .Include(d => d.Filmes)
-            .FirstOrDefault(d => d.Id == diretorNovo.Id);
+            .FirstOrDefaultAsync(d => d.Id == diretorNovo.Id);
 
         if (diretor != null)
         {
@@ -40,12 +40,12 @@ public class DiretorRepository(Context _context) : IDiretorRepository
 
             foreach (var filmeNovo in diretorNovo.Filmes)
             {
-                Filme filme;
+                Filme? filme;
 
                 if (filmeNovo.Id != 0)
                 {
                     // Buscar o filme existente
-                    filme = Context.Filmes.Find(filmeNovo.Id)!;
+                    filme = await Context.Filmes.FindAsync(filmeNovo.Id);
 
                     if (filme != null)
                     {
@@ -64,7 +64,7 @@ public class DiretorRepository(Context _context) : IDiretorRepository
                         // DiretorId = diretorNovo.Id,
                     };
 
-                    Context.Filmes.Add(filme);
+                     await Context.Filmes.AddAsync(filme);
                 }
 
                 diretor.Filmes.Add(filme!);
@@ -73,14 +73,14 @@ public class DiretorRepository(Context _context) : IDiretorRepository
         }
     }
 
-    public bool SaveChanges()
+    public async Task<bool> SaveChangesAsync()
     {
-       return Context.SaveChanges() > 0;
+       return (await Context.SaveChangesAsync()) > 0;
     }
 
-    public IEnumerable<DiretorDto> GetDiretores()
+    public async Task<IEnumerable<DiretorDto>> GetDiretoresAsync()
     {
-        return Context.Diretores
+        return await Context.Diretores
         .Include(f => f.Filmes)
         .Select(d => new DiretorDto
         {
@@ -95,33 +95,12 @@ public class DiretorRepository(Context _context) : IDiretorRepository
                 }
             ).ToList()
         })
-        .ToList();
+        .ToListAsync();
     }
 
-    public IEnumerable<DiretorDto> GetDiretorById(int id)
+    public async Task<IEnumerable<DiretorDto>> GetDiretorByIdAsync(int id)
     {
-        return Context.Diretores
-        .Include(f => f.Filmes)
-        .Where( d => d.Id == id)
-        .Select(d => new DiretorDto
-        {
-            Id = d.Id,
-            Name = d.Name,
-            Filmes = d.Filmes.Select(
-                f => new FilmeDto
-                {
-                    Id = f.Id,
-                    Titulo = f.Titulo,
-                    Ano = f.Ano
-                }
-            ).ToList()
-        })
-        .ToList();
-    }
-
-    public IEnumerable<DiretorDto> GetDiretorWhere(int id)
-    {
-        return Context.Diretores
+        return await Context.Diretores
         .Include(f => f.Filmes)
         .Where( d => d.Id == id)
         .Select(d => new DiretorDto
@@ -137,14 +116,35 @@ public class DiretorRepository(Context _context) : IDiretorRepository
                 }
             ).ToList()
         })
-        .ToList();
+        .ToListAsync();
     }
 
-    public Diretor GetDiretorByName(string name)
+    public async Task<IEnumerable<DiretorDto>> GetDiretorWhereAsync(int id)
     {
-        return Context.Diretores
+        return await Context.Diretores
+        .Include(f => f.Filmes)
+        .Where( d => d.Id == id)
+        .Select(d => new DiretorDto
+        {
+            Id = d.Id,
+            Name = d.Name,
+            Filmes = d.Filmes.Select(
+                f => new FilmeDto
+                {
+                    Id = f.Id,
+                    Titulo = f.Titulo,
+                    Ano = f.Ano
+                }
+            ).ToList()
+        })
+        .ToListAsync();
+    }
+
+    public async Task<Diretor> GetDiretorByNameAsync(string name)
+    {
+        return await Context.Diretores
             .Include(d => d.Filmes)
-            .FirstOrDefault(d => d.Name.Contains(name)) 
+            .FirstOrDefaultAsync(d => d.Name.Contains(name)) 
             ?? new Diretor { Id = 5555, Name = "Marina" };
     }
 }

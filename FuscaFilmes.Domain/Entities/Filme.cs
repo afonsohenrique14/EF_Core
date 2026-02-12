@@ -12,4 +12,8 @@ public class Filme
     public ICollection<DiretorFilme> DiretoresFilmes { get; set; } = null!;
     public ICollection<Diretor> Diretores { get; set; } = null!;
 
+    public static implicit operator Filme(ValueTask<Filme?> v)
+    {
+        throw new NotImplementedException();
+    }
 }

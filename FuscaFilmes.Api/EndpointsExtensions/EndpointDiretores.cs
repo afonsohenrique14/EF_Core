@@ -8,19 +8,19 @@ public static class EndpointDiretores
     {
         // HANDLERS DIRETORES
 
-        app.MapGet("/diretores", DiretoresHandlers.GetDiretores);
+        app.MapGet("/diretores", DiretoresHandlers.GetDiretoresAsync);
 
-        app.MapGet("/diretores/{id}", DiretoresHandlers.GetDiretorById );
+        app.MapGet("/diretores/{id}", DiretoresHandlers.GetDiretorByIdAsync );
 
-        app.MapGet("/diretores/agregacao/{name}", DiretoresHandlers.GetDiretorByName);
+        app.MapGet("/diretores/agregacao/{name}", DiretoresHandlers.GetDiretorByNameAsync);
 
-        app.MapGet("/diretores/where/{id}", DiretoresHandlers.GetDiretorWhere);
+        app.MapGet("/diretores/where/{id}", DiretoresHandlers.GetDiretorWhereAsync);
 
-        app.MapPost("/diretores", DiretoresHandlers.PostDiretor);
+        app.MapPost("/diretores", DiretoresHandlers.PostDiretorAsync);
 
-        app.MapPut("/diretores", DiretoresHandlers.PutDiretor);
+        app.MapPut("/diretores", DiretoresHandlers.PutDiretorAsync);
 
-        app.MapDelete("/diretores/{Id}", DiretoresHandlers.DeleteDiretor);
+        app.MapDelete("/diretores/{Id}", DiretoresHandlers.DeleteDiretorAsync);
 
     }
     

@@ -6,46 +6,46 @@ namespace FuscaFilmes.Api.EnpointsHandlers;
 
 public static class FilmesHandlers
 {
-    public static IEnumerable<FilmeDto> GetFilmes(IFilmeRepository repositoryFilmes)
+    public static Task<IEnumerable<FilmeDto>> GetFilmesAsync(IFilmeRepository repositoryFilmes)
     {
-        return  repositoryFilmes.GetFilmes();
+        return  repositoryFilmes.GetFilmesAsync();
     }
 
-    public static IEnumerable<FilmeDto> GetFilmeById(IFilmeRepository repositoryFilmes, int id)
+    public static Task<IEnumerable<FilmeDto>> GetFilmeByIdAsync(IFilmeRepository repositoryFilmes, int id)
     {
-         return repositoryFilmes.GetFilmeById(id);
+         return repositoryFilmes.GetFilmeByIdAsync(id);
     }
 
-    public static IEnumerable<FilmeDto> GetFilmeByName(IFilmeRepository repositoryFilmes, string titulo)
+    public static Task<IEnumerable<FilmeDto>> GetFilmeByNameAsync(IFilmeRepository repositoryFilmes, string titulo)
     {
-       return repositoryFilmes.GetFilmeByName(titulo);
+       return repositoryFilmes.GetFilmeByNameAsync(titulo);
     }
 
-    public static IEnumerable<FilmeDto> GetFilmeByNameLinq(IFilmeRepository repositoryFilmes, string titulo) 
+    public static Task<IEnumerable<FilmeDto>> GetFilmeByNameLinqAsync(IFilmeRepository repositoryFilmes, string titulo) 
     {
-        return repositoryFilmes.GetFilmeByNameLinq(titulo);
+        return repositoryFilmes.GetFilmeByNameLinqAsync(titulo);
 
     }
 
-    public static IResult PatchFilmeWithTRack(IFilmeRepository repositoryFilmes, FilmeUpdate filmeUpdate)
+    public static async Task<IResult> PatchFilmeWithTRackAsync(IFilmeRepository repositoryFilmes, FilmeUpdate filmeUpdate)
     {
 
-        Filme? filme = repositoryFilmes.PatchFilmeWithTRack(filmeUpdate); 
+        Filme? filme = await repositoryFilmes.PatchFilmeWithTRackAsync(filmeUpdate); 
 
         if (filme == null)
         {
             return Results.NotFound( new{ message = "Filme não encontrado"});
         }
 
-        repositoryFilmes.SaveChanges();
+        await repositoryFilmes.SaveChangesAsync();
 
         return Results.Ok( new{ message = $"Filme com Id {filmeUpdate.Id} foi atualizado com sucesso."});
 
     }
 
-    public static IResult PatchFilme(IFilmeRepository repositoryFilmes, FilmeUpdate filmeUpdate)
+    public static async Task<IResult> PatchFilmeAsync(IFilmeRepository repositoryFilmes, FilmeUpdate filmeUpdate)
     {
-        var affectedRows = repositoryFilmes.PatchFilme(filmeUpdate);
+        var affectedRows = await repositoryFilmes.PatchFilmeAsync(filmeUpdate);
 
         if(affectedRows > 0)
         {
@@ -59,9 +59,9 @@ public static class FilmesHandlers
     }
 
 
-    public static void DeleteFilme(IFilmeRepository repositoryFilmes, int Id)
+    public static void DeleteFilmeAsync(IFilmeRepository repositoryFilmes, int Id)
     {
-        repositoryFilmes.DeleteFilme(Id);
+        repositoryFilmes.DeleteFilmeAsync(Id);
 
     }
 

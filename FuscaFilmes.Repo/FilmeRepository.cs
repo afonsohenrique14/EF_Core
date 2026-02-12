@@ -11,17 +11,36 @@ public class FilmeRepository(Context _context) : IFilmeRepository
 {   
 
     Context Context {get;} = _context;
-    public void DeleteFilme(int Id)
-    {
-        Context.Filmes
-            .Where(f => f.Id == Id)
-            .ExecuteDelete();
 
+    public async Task<IEnumerable<FilmeDto>> GetFilmesAsync()
+    {
+        return await Context.Filmes
+            .Include(f=> f.Diretores)
+            .OrderByDescending(f => f.Ano)
+            .ThenBy(f => f.Titulo)
+            .Select(f=> new FilmeDto
+                {
+                    Id = f.Id,
+                    Titulo = f.Titulo,
+                    Ano = f.Ano,
+                    Diretores = f.Diretores.Select(
+                        d=> new DiretorDto
+                            {
+                                Id = d.Id,
+                                Name = d.Name
+
+                            }
+                    )
+                }
+            )
+            .ToListAsync();
     }
 
-    public IEnumerable<FilmeDto> GetFilmeById(int id)
+
+
+    public async Task<IEnumerable<FilmeDto>> GetFilmeByIdAsync(int id)
     {
-        return Context.Filmes
+        return await Context.Filmes
             .Where(f => f.Id == id)
             .Select(f=> new FilmeDto
                 {
@@ -38,13 +57,13 @@ public class FilmeRepository(Context _context) : IFilmeRepository
                     )
                 }
             )
-            .ToList();
+            .ToListAsync();
     }
 
-    public IEnumerable<FilmeDto> GetFilmeByName(string titulo)
+    public async Task<IEnumerable<FilmeDto>> GetFilmeByNameAsync(string titulo)
     {
 
-        return Context.Filmes
+        return await Context.Filmes
             .Include(f => f.Diretores)
             .Where(f =>
                 EF.Functions.Like(f.Titulo, $"%{titulo}%")
@@ -64,13 +83,13 @@ public class FilmeRepository(Context _context) : IFilmeRepository
                     )
                 }
             )
-            .ToList();
+            .ToListAsync();
 
     }
 
-    public IEnumerable<FilmeDto> GetFilmeByNameLinq(string titulo)
+    public async Task<IEnumerable<FilmeDto>> GetFilmeByNameLinqAsync(string titulo)
     {
-        return Context.Filmes
+        return await Context.Filmes
             .Include(f => f.Diretores)
             .Where(f => f.Titulo.ToUpper().Contains(titulo.ToUpper()))
             .Select(f=> new FilmeDto
@@ -88,47 +107,25 @@ public class FilmeRepository(Context _context) : IFilmeRepository
                     )
                 }
             )
-            .ToList();
+            .ToListAsync();
 
     }
 
-    public IEnumerable<FilmeDto> GetFilmes()
-    {
-        return Context.Filmes
-            .Include(f=> f.Diretores)
-            .OrderByDescending(f => f.Ano)
-            .ThenBy(f => f.Titulo)
-            .Select(f=> new FilmeDto
-                {
-                    Id = f.Id,
-                    Titulo = f.Titulo,
-                    Ano = f.Ano,
-                    Diretores = f.Diretores.Select(
-                        d=> new DiretorDto
-                            {
-                                Id = d.Id,
-                                Name = d.Name
+    
 
-                            }
-                    )
-                }
-            )
-            .ToList();
-    }
-
-    public int PatchFilme(FilmeUpdate filmeUpdate)
+    public async Task<int> PatchFilmeAsync(FilmeUpdate filmeUpdate)
     {
-        return Context.Filmes
+        return await Context.Filmes
             .Where(f => f.Id == filmeUpdate.Id)
-            .ExecuteUpdate(setter => setter
+            .ExecuteUpdateAsync(setter => setter
                 .SetProperty(f => f.Titulo, filmeUpdate.Titulo)
                 .SetProperty(f => f.Ano, filmeUpdate.Ano)
             );
     }
 
-    public Filme? PatchFilmeWithTRack(FilmeUpdate filmeUpdate)
+    public async Task<Filme?> PatchFilmeWithTRackAsync(FilmeUpdate filmeUpdate)
     {
-        var filme = Context.Filmes.Find(filmeUpdate.Id);
+        var filme = await Context.Filmes.FindAsync(filmeUpdate.Id);
 
         if (filme != null)
         {
@@ -141,10 +138,17 @@ public class FilmeRepository(Context _context) : IFilmeRepository
 
     }
 
-
-    public bool SaveChanges()
+    public async Task DeleteFilmeAsync(int Id)
     {
-       return Context.SaveChanges() > 0;
+        await Context.Filmes
+            .Where(f => f.Id == Id)
+            .ExecuteDeleteAsync();
+
+    }
+
+    public async Task<bool> SaveChangesAsync()
+    {
+       return (await Context.SaveChangesAsync()) > 0;
     }
 
 }
