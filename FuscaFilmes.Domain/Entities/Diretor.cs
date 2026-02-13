@@ -1,7 +1,12 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace FuscaFilmes.Domain.Entities;
 
 public class Diretor
 {
+    [Key]
+    // [Column("id_diretor")] // mapeando para coluna com outro nome no bd
     public int Id { get; set; }
 
     public required string Name { get; set; }
